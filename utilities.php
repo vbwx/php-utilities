@@ -453,12 +453,17 @@ function array_add (&$input1, $input2, $callback = null, $val = 0)
 	}, $input2);
 }
 
-function array_flatten($input, $prefix = '') {
+function array_flatten($input, $callback = null, $prefix = '') {
     $output = array();
+    if (!is_callable($callback)) {
+    	$callback = function($a, $b) {
+    		return ((string)$a === '' ? $b : $a . "[$b]");
+    	};
+    }
     foreach ($input as $key => $val) {
-        $key = ((string)$prefix === '' ? $key : $prefix . "[$key]");
+        $key = $callback($prefix, $key);
         if (is_array($val)) {
-            $output = array_merge($output, array_flatten($val, $key));
+            $output = array_merge($output, array_flatten($val, $callback, $key));
         }
         else {
             $output[$key] = $val;
