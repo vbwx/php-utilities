@@ -347,18 +347,18 @@ function removeDir ($dir, $rmdir = true, $rmfile = true, $countDir = false)
 	return $count;
 }
 
-function array_remove (&$ary, $val, $one = false)
+function array_remove (&$input, $val, $one = false)
 {
-	if (!is_array($ary))
+	if (!is_array($input))
 		return false;
 	if (!is_array($val))
 		$val = array($val);
 
 	$count = 0;
-	foreach (array_keys($ary) as $k)
-		if (in_array($ary[$k], $val))
+	foreach (array_keys($input) as $k)
+		if (in_array($input[$k], $val))
 		{
-			unset($ary[$k]);
+			unset($input[$k]);
 			if ($one)
 				return 1;
 			$count++;
@@ -366,16 +366,16 @@ function array_remove (&$ary, $val, $one = false)
 	return $count;
 }
 
-function array_count ($ary, $cond = 1000, $item_cond = null,
+function array_count ($input, $cond = 1000, $item_cond = null,
 					  $count_array = false)
 {
-	if (!is_array($ary))
+	if (!is_array($input))
 		return null;
 	$count = 0;
 	$depth = is_numeric($cond);
 	if ($depth and $cond < 0)
 		return null;
-	foreach ($ary as $v)
+	foreach ($input as $v)
 	{
 		if (is_array($v) and ($depth ? $cond : eval($cond)))
 			$count += array_count($v, ($depth ? $cond-1 : $cond), $item_cond,
@@ -386,9 +386,9 @@ function array_count ($ary, $cond = 1000, $item_cond = null,
 	return $count + $count_array;
 }
 
-function array_sort ($ary, $func = 'sort', $option = null)
+function array_sort ($input, $func = 'sort', $option = null)
 {
-	if (!is_array($ary))
+	if (!is_array($input))
 		return false;
 	$reverse = $option === true || $option < 0;
 	if (is_bool($func))
@@ -408,8 +408,8 @@ function array_sort ($ary, $func = 'sort', $option = null)
 			$reverse = true;
 		elseif ($func == 0)
 		{
-			$ary = array_values($ary);
-			return ($reverse ? array_reverse($ary) : $ary);
+			$input = array_values($input);
+			return ($reverse ? array_reverse($input) : $input);
 		}
 
 		$option = null;
@@ -419,33 +419,52 @@ function array_sort ($ary, $func = 'sort', $option = null)
 		$func .= 'sort';
 
 	if ($option === null or $option === false)
-		$func($ary);
+		$func($input);
 	elseif (is_string($option))
 	{
 		if (preg_match('/^[\w.:!|\/\\, -]+$/', $option))
 			$option = "return strcasecmp(\$a['$option'], \$b['$option']);";
-		$func($ary, create_function('$a, $b', $option));
+		$func($input, create_function('$a, $b', $option));
 	}
 	else
-		$func($ary, $option);
+		$func($input, $option);
 
-	return ($reverse ? array_reverse($ary, true) : $ary);
+	return ($reverse ? array_reverse($input, true) : $input);
 }
 
-function array_add (&$ary1, $ary2, $op = '$a+$b', $val = 0)
+function array_add (&$input1, $input2, $callback = null, $val = 0)
 {
-	if (!$ary2)
-		return ($ary1 ? (array)$ary1 : array());
-	$ary1 += array_fill_keys(array_keys(array_diff_key($ary2, $ary1)), $val);
-	array_walk($ary1, function (&$a, $k, $ary) {
-		$b = @$ary[$k];
+	if (empty($input2))
+		return;
+	if (!is_callable($callback)) {
+		$callback = function($a, $b) {
+			return $a + $b;
+		};
+	}
+	$input1 += array_fill_keys(array_keys(array_diff_key($input2, $input1)), $val);
+	array_walk($input1, function (&$a, $k, $input) {
+		$b = @$input[$k];
 		if (is_array($b))
 			$a = (empty($a) ? $b : array_merge((array)$a, $b));
 		elseif (is_array($a))
 			$a[] = $b;
-		elseif (array_key_exists($k, $ary))
-			eval("\$a = $op;");
-	}, $ary2);
+		elseif (array_key_exists($k, $input))
+			$a = $callback($a, $b, $k);
+	}, $input2);
+}
+
+function array_flatten($input, $prefix = '') {
+    $output = array();
+    foreach ($input as $key => $val) {
+        $key = ((string)$prefix === '' ? $key : $prefix . "[$key]");
+        if (is_array($val)) {
+            $output = array_merge($output, array_flatten($val, $key));
+        }
+        else {
+            $output[$key] = $val;
+        }
+    }
+    return $output;
 }
 
 function truncate ($str, $len, $replace = ' ...')
