@@ -585,7 +585,7 @@ function metricFormat ($val, $unit = "B", $base = 1000, $precision = 2, $point =
 			break;
 		}
 	}
-    $rem = abs($precision) - strlen(intval($val));
+    $rem = abs($precision) - strlen(intval($val)) + 1;
     return sprintf($format, number_format($val,
         ($precision >= 0 ? $precision : ($rem > 0 ? $rem : 0)), $point, $thousand), $unit);
 }
