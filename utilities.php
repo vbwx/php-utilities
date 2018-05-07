@@ -24,7 +24,7 @@ function prettyTime ($t, $m = null, $format1 = "H:i", $format2 = "%02d:%02d")
 {
 	global $PRETTYTIME;
 	if (count($PRETTYTIME))
-		extract($PRETTYTIME);
+		extract($PRETTYTIME, EXTR_SKIP);
 
 	if (is_array($t))
 		return sprintf($format2, $t['hours'], $t['minutes']);
@@ -42,7 +42,7 @@ function prettyDate ($d, $m = null, $format1 = "d.m.", $format2 = "%02d.%02d.")
 	if (!$d)
 		return '';
 	if (count($PRETTYDATE))
-		extract($PRETTYDATE);
+		extract($PRETTYDATE, EXTR_SKIP);
 	if (is_array($d))
 		return sprintf($format2, $d['day'], $d['month']);
 	if ($m)
@@ -76,7 +76,7 @@ function datetime ($s = true, $format = true, $separator = ' - ')
 {
 	global $DATETIME;
 	if (count($DATETIME))
-		extract($DATETIME);
+		extract($DATETIME, EXTR_SKIP);
 
 	if ($format === true)
 		$format = 'd. m. Y, H:i:s';
@@ -491,7 +491,7 @@ function sprintq ($num = 0, $word = "item", $verbs = array('is', 'are'), $plural
 {
 	global $SPRINTQ;
 	if (count($SPRINTQ))
-		extract($SPRINTQ);
+		extract($SPRINTQ, EXTR_SKIP);
 
 	$num = intval($num);
 	$n = abs($num);
@@ -606,7 +606,7 @@ function mv_uploaded_file ($orig, $dest, $separator = '-', $websafe = true, $for
 	global $MVUPLOADEDFILE;
 
 	if (count($MVUPLOADEDFILE))
-		extract($MVUPLOADEDFILE);
+		extract($MVUPLOADEDFILE, EXTR_SKIP);
 
 	if ($dest === '')
 		$dest = $orig;
