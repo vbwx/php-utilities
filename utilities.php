@@ -550,7 +550,8 @@ function printq ($num = 0, $word = "item", $verbs = array('is', 'are'), $plural 
 	print sprintq($num, $word, $verbs, $plural, $format);
 }
 
-function metricFormat ($val, $unit = "B", $base = 1000, $precision = 2, $point = '.', $thousand = '', $format = '%1$s %2$s')
+function metricFormat ($val, $unit = "B", $base = 1000, $precision = 2, $point = '.',
+	$thousand = '', $format = '%1$s %2$s')
 {
 	static $SI = array(
 		24  => "Y",
@@ -584,7 +585,9 @@ function metricFormat ($val, $unit = "B", $base = 1000, $precision = 2, $point =
 			break;
 		}
 	}
-	return sprintf($format, number_format($val, $precision, $point, $thousand), $unit);
+    $rem = abs($precision) - strlen(intval($val));
+    return sprintf($format, number_format($val,
+        ($precision >= 0 ? $precision : ($rem > 0 ? $rem : 0)), $point, $thousand), $unit);
 }
 
 function websafe ($file)
